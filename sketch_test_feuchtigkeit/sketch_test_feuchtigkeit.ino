@@ -1,4 +1,4 @@
-const int sensorPin = A0;  // Feuchtigkeitssensor an Analog-Pin A0
+const int sensorPin = 8;  // Feuchtigkeitssensor an Analog-Pin A0
 
 void setup() {
   Serial.begin(9600);

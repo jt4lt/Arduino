@@ -1,5 +1,5 @@
 // Pin-Konfiguration
-const int sensorPin = 34;  // ADC-Pin für Feuchtigkeitssensor
+const int sensorPin = 8;  // ADC-Pin für Feuchtigkeitssensor
 const int pumpPin = 26;    // GPIO zur Steuerung der Pumpe (z. B. über MOSFET oder Relais)
 
 // Schwellenwert und Pumpdauer
