@@ -81,4 +81,55 @@ void setup() {
 
     // Gärungsgrad (0–100 %)
     float fermentationProgress = (angle / 90.0) * 100.0;
-    if (fermentationProgress > 100) fermentation
+    if (fermentationProgress > 100) fermentationProgress = 100;
+
+    // Werte speichern
+    addSample(tempC, angle);
+
+    // HTML-Seite mit Chart.js
+    String html = "<html><head><meta charset='UTF-8'><title>Cidre-Spindel</title>";
+    html += "<script src='https://cdn.jsdelivr.net/npm/chart.js'></script></head><body>";
+    html += "<h1>Cidre Gärspindel</h1>";
+    html += "<p>Temperatur: " + String(tempC) + " °C</p>";
+    html += "<p>Winkel: " + String(angle) + " °</p>";
+    html += "<p>Gärungsgrad: " + String(fermentationProgress, 1) + " %</p>";
+    html += "<canvas id='chart' width='400' height='200'></canvas>";
+    html += "<script>";
+    html += "const ctx = document.getElementById('chart').getContext('2d');";
+    html += "new Chart(ctx, {type: 'line', data: {labels: [";
+
+    // Labels (0..MAX_SAMPLES-1)
+    for (int i = 0; i < MAX_SAMPLES; i++) {
+      html += "'" + String(i) + "'";
+      if (i < MAX_SAMPLES - 1) html += ",";
+    }
+
+    html += "], datasets: [{label: 'Temperatur (°C)', data: [";
+
+    // Temperaturwerte
+    for (int i = 0; i < MAX_SAMPLES; i++) {
+      html += String(tempHistory[i]);
+      if (i < MAX_SAMPLES - 1) html += ",";
+    }
+
+    html += "], borderColor: 'red', fill: false}, {label: 'Winkel (°)', data: [";
+
+    // Winkelwerte
+    for (int i = 0; i < MAX_SAMPLES; i++) {
+      html += String(angleHistory[i]);
+      if (i < MAX_SAMPLES - 1) html += ",";
+    }
+
+    html += "], borderColor: 'blue', fill: false}]}});";
+    html += "</script></body></html>";
+
+    server.send(200, "text/html", html);
+  });
+
+  // Server starten
+  server.begin();
+}
+
+void loop() {
+  server.handleClient();
+}
