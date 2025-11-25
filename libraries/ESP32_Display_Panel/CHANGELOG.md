@@ -1,5 +1,18 @@
 # ChangeLog
 
+## v1.0.4 - 2025-09-19
+
+### Enhancements:
+
+* feat(board): add support for Waveshare ESP32-S3 Touch LCD 2.8C @martinroger (#226)
+* feat(docs): document usage of `esp_panel_board_custom_conf.h` with ESP-IDF @martinroger (#226)
+
+### Bugfixes:
+
+* fix(repo): update dependent esp-lib-utils version for Arduino
+* fix(board): fixing error on inverted colors (may still need bitshifting in LVGL) @martinroger (#238)
+* fix(board): fix screen initialization code for BOARD_ESP32_S3_TOUCH_LCD_1_85 @ggc121238 (#239)
+
 ## v1.0.3 - 2025-07-07
 
 ### Enhancements:
