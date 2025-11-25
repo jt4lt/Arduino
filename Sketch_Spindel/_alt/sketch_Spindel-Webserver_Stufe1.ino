@@ -17,29 +17,9 @@ ESP8266WebServer server(80);
 Adafruit_MPU6050 mpu;
 
 // DS18B20
-#define ONE_WIRE_PIN 2 // D4 (GPIO2)
+#define ONE_WIRE_PIN 2 // D4 (GPIO4) empfohlen
 OneWire oneWire(ONE_WIRE_PIN);
 DallasTemperature sensors(&oneWire);
-
-// Speicher für Verlauf
-#define MAX_SAMPLES 50
-float tempHistory[MAX_SAMPLES];
-float angleHistory[MAX_SAMPLES];
-int sampleIndex = 0;
-
-// Hilfsfunktion: Winkel aus Beschleunigungswerten berechnen
-float calculateAngle(float x, float y, float z) {
-  float angle = atan2(x, z) * 180.0 / PI;
-  if (angle < 0) angle += 180; // nur positive Werte
-  return angle;
-}
-
-// Neue Werte ins Array einfügen (Ringpuffer)
-void addSample(float temp, float angle) {
-  tempHistory[sampleIndex] = temp;
-  angleHistory[sampleIndex] = angle;
-  sampleIndex = (sampleIndex + 1) % MAX_SAMPLES;
-}
 
 void setup() {
   Serial.begin(115200);
@@ -76,9 +56,20 @@ void setup() {
     sensors.requestTemperatures();
     float tempC = sensors.getTempCByIndex(0);
 
-    // Winkel berechnen
-    float angle = calculateAngle(a.acceleration.x, a.acceleration.y, a.acceleration.z);
+    String html = "<html><head><meta charset='UTF-8'><title>Bier-Spindel</title></head><body>";
+    html += "<h1>Tobias seine Spindel</h1>";
+    html += "<p>Temperatur: " + String(tempC) + " °C</p>";
+    html += "<p>Accel X: " + String(a.acceleration.x) + " m/s²</p>";
+    html += "<p>Accel Y: " + String(a.acceleration.y) + " m/s²</p>";
+    html += "<p>Accel Z: " + String(a.acceleration.z) + " m/s²</p>";
+    html += "</body></html>";
 
-    // Gärungsgrad (0–100 %)
-    float fermentationProgress = (angle / 90.0) * 100.0;
-    if (fermentationProgress > 100) fermentation
+    server.send(200, "text/html", html);
+  });
+
+  server.begin();
+}
+
+void loop() {
+  server.handleClient();
+}
