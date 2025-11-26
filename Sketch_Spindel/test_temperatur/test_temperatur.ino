@@ -1,8 +1,8 @@
 #include <OneWire.h>
 #include <DallasTemperature.h>
 
-// Pin-Definition: D4 = GPIO2
-#define ONE_WIRE_PIN 2
+// Pin-Definition: D5 = GPIO14
+#define ONE_WIRE_PIN 14
 
 // OneWire und DallasTemperature Objekte
 OneWire oneWire(ONE_WIRE_PIN);

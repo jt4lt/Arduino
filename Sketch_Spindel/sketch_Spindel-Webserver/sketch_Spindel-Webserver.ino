@@ -17,15 +17,15 @@ ESP8266WebServer server(80);
 Adafruit_MPU6050 mpu;
 
 // DS18B20
-#define ONE_WIRE_PIN 2 // D4 (GPIO2)
+#define ONE_WIRE_PIN 14 // D5 (GPIO14) -> sicherer Pin für OneWire
 OneWire oneWire(ONE_WIRE_PIN);
 DallasTemperature sensors(&oneWire);
 
 // Speicher für Verlauf
-#define MAX_SAMPLES 1000
+#define MAX_SAMPLES 200   // stabiler Wert für ESP8266
 float tempHistory[MAX_SAMPLES];
 float angleHistory[MAX_SAMPLES];
-String timeHistory[MAX_SAMPLES];
+unsigned long timeHistory[MAX_SAMPLES];  // Sekunden seit Start
 int sampleIndex = 0;
 
 // Konfigurationswerte
@@ -45,10 +45,7 @@ float calculateAngle(float x, float y, float z) {
 void addSample(float temp, float angle) {
   tempHistory[sampleIndex] = temp;
   angleHistory[sampleIndex] = angle;
-
-  unsigned long seconds = millis() / 1000;
-  timeHistory[sampleIndex] = String(seconds) + "s";
-
+  timeHistory[sampleIndex] = millis() / 1000;  // Sekunden seit Start
   sampleIndex = (sampleIndex + 1) % MAX_SAMPLES;
 }
 
@@ -82,7 +79,7 @@ void setup() {
   // Hauptseite
   server.on("/", []() {
     String html = "<html><head><meta charset='UTF-8'><title>Cidre-Spindel</title>";
-    html += "<meta name='viewport' content='width=device-width, initial-scale=1'>"; // Handy-Optimierung
+    html += "<meta name='viewport' content='width=device-width, initial-scale=1'>";
     html += "<style>";
     html += "body{font-family:sans-serif;margin:10px;}h1{text-align:center;font-size:20px;}";
     html += "form input{width:100%;margin:5px 0;padding:6px;font-size:14px;}";
@@ -100,14 +97,14 @@ void setup() {
     html += "Intervall (ms): <input type='number' name='interval' value='" + String(measureInterval) + "'><br>";
     html += "<input type='submit' value='Speichern'></form>";
 
-    // Chart.js oben, responsive Container
+    // Chart.js oben
     html += "<div style='width:100%;height:300px;'><canvas id='chart'></canvas></div>";
     html += "<script>";
     html += "const ctx = document.getElementById('chart').getContext('2d');";
     html += "new Chart(ctx, {type: 'line', data: {labels: [";
 
     for (int i = 0; i < MAX_SAMPLES; i++) {
-      html += "'" + timeHistory[i] + "'";
+      html += "'" + String(timeHistory[i]) + "s'";
       if (i < MAX_SAMPLES - 1) html += ",";
     }
 
@@ -129,7 +126,7 @@ void setup() {
     // Tabelle mit Messwerten
     html += "<h2>Messwerte</h2><table><tr><th>Zeit</th><th>Temperatur (°C)</th><th>Winkel (°)</th></tr>";
     for (int i = 0; i < MAX_SAMPLES; i++) {
-      html += "<tr><td>" + timeHistory[i] + "</td><td>" + String(tempHistory[i]) + "</td><td>" + String(angleHistory[i]) + "</td></tr>";
+      html += "<tr><td>" + String(timeHistory[i]) + "s</td><td>" + String(tempHistory[i]) + "</td><td>" + String(angleHistory[i]) + "</td></tr>";
     }
     html += "</table>";
 
