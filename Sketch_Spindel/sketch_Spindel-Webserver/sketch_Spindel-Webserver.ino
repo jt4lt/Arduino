@@ -7,8 +7,8 @@
 #include <DallasTemperature.h>
 
 // WLAN Zugangsdaten
-const char* ssid = "GRS Gast Wlan";
-const char* password = "20097.oben;";
+const char* ssid = "wirhier";
+const char* password = "NiToLaNi4!2908PMOOR";
 
 ESP8266WebServer server(80);
 
